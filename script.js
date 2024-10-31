@@ -14,35 +14,15 @@ function startMeasurement() {
     distanceX = 0; distanceY = 0; distanceZ = 0;
     lastTimestamp = null;
 
-    // Check if Device Motion is supported
-    if (window.DeviceMotionEvent) {
-        // Request permission on iOS devices
-        if (typeof DeviceMotionEvent.requestPermission === 'function') {
-            DeviceMotionEvent.requestPermission()
-                .then((response) => {
-                    if (response === 'granted') {
-                        startListening();
-                    } else {
-                        errorDisplay.textContent = 'Permission denied for motion data.';
-                    }
-                })
-                .catch((error) => {
-                    errorDisplay.textContent = 'Error requesting permission: ' + error;
-                });
-        } else {
-            startListening(); // For non-iOS devices
-        }
-    } else {
-        errorDisplay.textContent = 'Device Motion not supported on this device.';
-    }
-}
-
-function startListening() {
     // Start listening to accelerometer
-    window.addEventListener('devicemotion', handleMotionEvent);
-    startButton.disabled = true;
-    stopButton.disabled = false;
-    errorDisplay.textContent = '';
+    if (window.DeviceMotionEvent) {
+        window.addEventListener('devicemotion', handleMotionEvent);
+        startButton.disabled = true;
+        stopButton.disabled = false;
+        errorDisplay.textContent = '';
+    } else {
+        errorDisplay.textContent = 'Accelerometer not supported on this device.';
+    }
 }
 
 function stopMeasurement() {
@@ -53,7 +33,7 @@ function stopMeasurement() {
 }
 
 function handleMotionEvent(event) {
-    const acceleration = event.accelerationIncludingGravity;
+    const acceleration = event.acceleration;
     const timestamp = event.timeStamp;
 
     // Ignore null accelerations
